@@ -13,50 +13,50 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Cliente {
-  id       Int    @id @default(autoincrement())
-  nome     String
-  email    String
-  telefone String
+model Customer {
+  id        Int    @id @default(autoincrement())
+  name      String
+  email     String
+  telephone String
 
-  reservas Reserva[]
+  reservations Reservation[]
 
-  @@map("cliente")
+  @@map("customers")
 }
 
-model Quarto {
-  id     Int          @id @default(autoincrement())
-  numero Int
-  status StatusQuarto
+model Room {
+  id     Int        @id @default(autoincrement())
+  number Int
+  status RoomStatus
 
-  reserva Reserva[]
+  reservation Reservation[]
 
-  @@map("quarto")
+  @@map("rooms")
 }
 
-model Reserva {
-  id            Int           @id @default(autoincrement())
-  id_cliente    Int
-  id_quarto     Int
-  data_checkin  DateTime
-  data_checkout DateTime
-  status        StatusReserva
+model Reservation {
+  id            Int               @id @default(autoincrement())
+  id_customer   Int
+  id_room       Int
+  date_checkin  DateTime
+  date_checkout DateTime
+  status        ReservationStatus
 
-  cliente Cliente @relation(fields: [id_cliente], references: id)
-  quarto  Quarto  @relation(fields: [id_quarto], references: id)
+  customer Customer @relation(fields: [id_customer], references: id)
+  room     Room     @relation(fields: [id_room], references: id)
 
-  @@map("reserva")
+  @@map("reservations")
 }
 
-enum StatusQuarto {
-  disponivel
-  reservado
-  manutencao
+enum RoomStatus {
+  available
+  booked
+  maintenance
 }
 
-enum StatusReserva {
-  ativa
-  cancelada
+enum ReservationStatus {
+  active
+  cancelled
   checkin
-  finalizada
+  closed
 }
