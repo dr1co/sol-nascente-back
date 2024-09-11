@@ -12,3 +12,51 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Cliente {
+  id       Int    @id @default(autoincrement())
+  nome     String
+  email    String
+  telefone String
+
+  reservas Reserva[]
+
+  @@map("cliente")
+}
+
+model Quarto {
+  id     Int          @id @default(autoincrement())
+  numero Int
+  status StatusQuarto
+
+  reserva Reserva[]
+
+  @@map("quarto")
+}
+
+model Reserva {
+  id            Int           @id @default(autoincrement())
+  id_cliente    Int
+  id_quarto     Int
+  data_checkin  DateTime
+  data_checkout DateTime
+  status        StatusReserva
+
+  cliente Cliente @relation(fields: [id_cliente], references: id)
+  quarto  Quarto  @relation(fields: [id_quarto], references: id)
+
+  @@map("reserva")
+}
+
+enum StatusQuarto {
+  disponivel
+  reservado
+  manutencao
+}
+
+enum StatusReserva {
+  ativa
+  cancelada
+  checkin
+  finalizada
+}
