@@ -1,19 +1,29 @@
 import client from "../database/prisma";
 
-async function create(name: string) {
+async function create(name: string, cpf: string) {
   const newCustomer = await client.customer.create({
     data: {
       name,
-      email: "email@example.com",
-      telephone: "11922223333",
+      cpf
     },
   });
 
   return newCustomer;
 }
 
+async function findByCpf(cpf: string) {
+  const customer = await client.customer.findUnique({
+    where: {
+      cpf
+    }
+  });
+
+  return customer;
+}
+
 const customerModels = {
   create,
+  findByCpf
 };
 
 export default customerModels;

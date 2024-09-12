@@ -2,8 +2,8 @@ import client from "../database/prisma";
 
 async function create(
   customerId: number,
-  dateCheckin: Date,
-  dateCheckout: Date
+  dateCheckin: string,
+  dateCheckout: string
 ) {
   const reservation = await client.reservation.create({
     data: {

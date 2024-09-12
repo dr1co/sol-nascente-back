@@ -16,8 +16,7 @@ datasource db {
 model Customer {
   id        Int    @id @default(autoincrement())
   name      String
-  email     String
-  telephone String
+  cpf  String @unique
 
   reservations Reservation[]
 
@@ -38,8 +37,8 @@ model Reservation {
   id            Int               @id @default(autoincrement())
   id_customer   Int
   id_room       Int
-  date_checkin  DateTime
-  date_checkout DateTime
+  date_checkin  String
+  date_checkout String
   status        ReservationStatus
 
   customer Customer @relation(fields: [id_customer], references: id)

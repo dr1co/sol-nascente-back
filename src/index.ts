@@ -5,9 +5,11 @@ import dotenv from "dotenv";
 import globalRouter from "./routes/globalRouter";
 
 dotenv.config();
-const PORT = Number(process.env.PORT) | 4001;
+const PORT = Number(process.env.PORT) || 4001;
 
 const server = express();
+
+server.use(express.json())
 server.use(cors());
 
 server.use(globalRouter);
