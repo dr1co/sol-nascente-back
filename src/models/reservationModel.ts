@@ -1,5 +1,12 @@
 import client from "../database/prisma";
 
+enum ReservationStatus {
+  active = "active",
+  cancelled = "cancelled",
+  checkin = "checkin",
+  closed = "closed"
+}
+
 async function create(
   customerId: number,
   dateCheckin: string,
@@ -28,9 +35,22 @@ async function findById(id: number) {
   return reservation;
 }
 
+async function updateStatusById(id: number, status: ReservationStatus) {
+  const reservation = await client.reservation.update({
+    data: {
+      status
+    },
+    where: {
+      id
+    }
+  });
+}
+
 const reservationModels = {
   findById,
   create,
+  updateStatusById,
+  ReservationStatus
 };
 
 export default reservationModels;

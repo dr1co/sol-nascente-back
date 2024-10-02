@@ -46,8 +46,46 @@ async function validateReservation(
   }
 }
 
+async function validateCheckin(req: Request, res: Response, next: NextFunction) {
+  const { id } = req.params;
+
+  try {
+    const reservation = await reservationModels.findById(Number(id));
+
+    if (!reservation) {
+      return res.status(404).send({ error: "Reservation not found!" });
+    }
+
+    await reservationModels.updateStatusById(Number(id), reservationModels.ReservationStatus.checkin);
+
+    res.sendStatus(204);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+}
+
+async function validateCheckout(req: Request, res: Response, next: NextFunction) {
+  const { id } = req.params;
+
+  try {
+    const reservation = await reservationModels.findById(Number(id));
+
+    if (!reservation) {
+      return res.status(404).send({ error: "Reservation not found!" });
+    }
+
+    await reservationModels.updateStatusById(Number(id), reservationModels.ReservationStatus.closed);
+
+    res.sendStatus(204);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+}
+
 const reservationControllers = {
-  validateReservation
+  validateReservation,
+  validateCheckin,
+  validateCheckout,
 };
 
 export default reservationControllers;
