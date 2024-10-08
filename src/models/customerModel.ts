@@ -1,21 +1,59 @@
 import client from "../database/prisma";
 
-async function create(name: string, cpf: string) {
+export interface RegisterInterface {
+  id: number;
+  name: string;
+  email: string;
+  cpf: string;
+  password: string;
+}
+
+async function create(customer: Omit<RegisterInterface, "id">) {
+  const { name, cpf, email, password } = customer;
+
   const newCustomer = await client.customer.create({
     data: {
       name,
-      cpf
+      cpf,
+      email,
+      password,
+    },
+    select: {
+      id: true,
+      name: true,
+      cpf: true,
+      email: true,
     },
   });
 
   return newCustomer;
 }
 
+async function findById(id: number) {
+  const customer = await client.customer.findUnique({
+    where: {
+      id,
+    },
+  });
+
+  return customer;
+}
+
 async function findByCpf(cpf: string) {
   const customer = await client.customer.findUnique({
     where: {
-      cpf
-    }
+      cpf,
+    },
+  });
+
+  return customer;
+}
+
+async function findByEmail(email: string) {
+  const customer = await client.customer.findUnique({
+    where: {
+      email,
+    },
   });
 
   return customer;
@@ -23,7 +61,9 @@ async function findByCpf(cpf: string) {
 
 const customerModels = {
   create,
-  findByCpf
+  findById,
+  findByCpf,
+  findByEmail,
 };
 
 export default customerModels;

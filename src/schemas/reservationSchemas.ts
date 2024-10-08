@@ -1,9 +1,8 @@
 import joi from "joi";
 
-export const reservationSchema = joi.object({
-  name: joi.string().required(),
-  cpf: joi.string().pattern(/^\d{11}$/).required(),
+export const reservationSchema = joi.object().keys({
+  customerId: joi.number().integer().required(),
+  roomId: joi.number().integer().required(),
   dateCheckin: joi.string().isoDate().required(),
   dateCheckout: joi.string().isoDate().required(),
-  roomId: joi.number().required(),
 });

@@ -1,44 +1,40 @@
 import { Request, Response, NextFunction } from "express";
 
-import reservationModels from "../models/reservationModel";
+import reservationModels, {
+  ReservationInterface,
+  ReservationStatus,
+} from "../models/reservationModel";
 import customerModels from "../models/customerModel";
-import roomModels from "../models/roomModel";
+import roomModels, { RoomStatus } from "../models/roomModel";
 
 async function validateReservation(
   req: Request,
   res: Response,
   next: NextFunction
 ) {
-  const body = res.locals.body;
+  const body = res.locals.body as Omit<ReservationInterface, "id" | "status">;
 
   try {
     const room = await roomModels.findById(body.roomId);
 
-    if (room.status !== roomModels.RoomStatus.available) {
+    if (room.status !== RoomStatus.available) {
       return res.status(401).send({ error: "Room is not available!" });
     }
 
-    const customer = await customerModels.findByCpf(body.cpf);
-
-    let customerId = customer?.id;
-    let createCustomer = null;
+    const customer = await customerModels.findById(body.customerId);
 
     if (!customer) {
-      createCustomer = await customerModels.create(body.name, body.cpf);
-      customerId = createCustomer.id;
+      return res.status(404).send({ error: "Customer not found!" });
     }
 
-    if (!customerId) {
-      throw { error: "Customer ID is undefined" };
-    }
+    const placeReservation = await reservationModels.create({
+      customerId: customer.id,
+      roomId: body.roomId,
+      dateCheckin: body.dateCheckin,
+      dateCheckout: body.dateCheckout,
+    });
 
-    const placeReservation = await reservationModels.create(
-      customerId,
-      body.dateCheckin,
-      body.dateCheckout,
-    );
-
-    await roomModels.updateStatusById(body.roomId, roomModels.RoomStatus.booked);
+    await roomModels.updateStatusById(body.roomId, RoomStatus.booked);
 
     res.status(201).send({ placeReservation });
   } catch (err) {
@@ -46,7 +42,11 @@ async function validateReservation(
   }
 }
 
-async function validateCheckin(req: Request, res: Response, next: NextFunction) {
+async function validateCheckin(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
   const { id } = req.params;
 
   try {
@@ -56,7 +56,10 @@ async function validateCheckin(req: Request, res: Response, next: NextFunction) 
       return res.status(404).send({ error: "Reservation not found!" });
     }
 
-    await reservationModels.updateStatusById(Number(id), reservationModels.ReservationStatus.checkin);
+    await reservationModels.updateStatusById(
+      Number(id),
+      ReservationStatus.checkin
+    );
 
     res.sendStatus(204);
   } catch (err) {
@@ -64,7 +67,11 @@ async function validateCheckin(req: Request, res: Response, next: NextFunction) 
   }
 }
 
-async function validateCheckout(req: Request, res: Response, next: NextFunction) {
+async function validateCheckout(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
   const { id } = req.params;
 
   try {
@@ -74,7 +81,15 @@ async function validateCheckout(req: Request, res: Response, next: NextFunction)
       return res.status(404).send({ error: "Reservation not found!" });
     }
 
-    await reservationModels.updateStatusById(Number(id), reservationModels.ReservationStatus.closed);
+    await reservationModels.updateStatusById(
+      Number(id),
+      ReservationStatus.closed
+    );
+
+    await roomModels.updateStatusById(
+      reservation.id_room,
+      RoomStatus.available
+    );
 
     res.sendStatus(204);
   } catch (err) {

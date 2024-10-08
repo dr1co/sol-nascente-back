@@ -1,6 +1,6 @@
 import client from "../database/prisma";
 
-enum RoomStatus {
+export enum RoomStatus {
   available = "available",
   booked = "booked",
   maintenance = "maintenance",
@@ -9,8 +9,8 @@ enum RoomStatus {
 async function findById(id: number) {
   const room = await client.room.findUniqueOrThrow({
     where: {
-      id
-    }
+      id,
+    },
   });
 
   return room;
@@ -23,14 +23,13 @@ async function updateStatusById(id: number, status: RoomStatus) {
     },
     where: {
       id,
-    }
+    },
   });
 }
 
 const roomModels = {
   findById,
   updateStatusById,
-  RoomStatus,
-}
+};
 
 export default roomModels;

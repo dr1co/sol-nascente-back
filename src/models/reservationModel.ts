@@ -1,21 +1,30 @@
 import client from "../database/prisma";
 
-enum ReservationStatus {
+export enum ReservationStatus {
   active = "active",
   cancelled = "cancelled",
   checkin = "checkin",
-  closed = "closed"
+  closed = "closed",
+}
+
+export interface ReservationInterface {
+  id: number;
+  customerId: number;
+  roomId: number;
+  dateCheckin: string;
+  dateCheckout: string;
+  status: ReservationStatus;
 }
 
 async function create(
-  customerId: number,
-  dateCheckin: string,
-  dateCheckout: string
+  reservationData: Omit<ReservationInterface, "id" | "status">
 ) {
+  const { customerId, roomId, dateCheckin, dateCheckout } = reservationData;
+
   const reservation = await client.reservation.create({
     data: {
       id_customer: customerId,
-      id_room: 1,
+      id_room: roomId,
       date_checkin: dateCheckin,
       date_checkout: dateCheckout,
       status: "active",
@@ -38,11 +47,11 @@ async function findById(id: number) {
 async function updateStatusById(id: number, status: ReservationStatus) {
   const reservation = await client.reservation.update({
     data: {
-      status
+      status,
     },
     where: {
-      id
-    }
+      id,
+    },
   });
 }
 
@@ -50,7 +59,6 @@ const reservationModels = {
   findById,
   create,
   updateStatusById,
-  ReservationStatus
 };
 
 export default reservationModels;
