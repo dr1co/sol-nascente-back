@@ -6,6 +6,16 @@ export enum RoomStatus {
   maintenance = "maintenance",
 }
 
+async function getAvailableRooms() {
+  const rooms = await client.room.findMany({
+    where: {
+      status: RoomStatus.available,
+    },
+  });
+
+  return rooms;
+}
+
 async function findById(id: number) {
   const room = await client.room.findUniqueOrThrow({
     where: {
@@ -30,6 +40,7 @@ async function updateStatusById(id: number, status: RoomStatus) {
 const roomModels = {
   findById,
   updateStatusById,
+  getAvailableRooms,
 };
 
 export default roomModels;
