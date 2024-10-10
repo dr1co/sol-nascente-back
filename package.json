@@ -6,8 +6,9 @@
     "build": "npx tsc && prisma migrate deploy",
     "start": "node ./dist/index.js",
     "dev": "npx nodemon ./src/index.ts",
-    "setup": "npm install && npx prisma migrate dev && ts-node ./scripts/seedDB.ts",
-    "reset-db": "ts-node ./scripts/resetDB.ts && npx prisma migrate reset",
+    "reset-db": "npx prisma migrate reset",
+    "seed": "npm run reset-db && ts-node ./scripts/seedDB.ts",
+    "setup": "npm install && npx prisma migrate dev && npm run seed",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
