@@ -44,8 +44,34 @@ async function registerCustomer(
   }
 }
 
+async function loginCustomer(req: Request, res: Response, next: NextFunction) {
+  const body = res.locals.body as Pick<RegisterInterface, "email" | "password">;
+
+  try {
+    const customer = await customerModels.findByEmail(body.email);
+
+    if (!customer) {
+      return res.status(401).send({ error: "Incorrect credentials!" });
+    }
+
+    const matchPassword = await bcrypt.compare(
+      body.password,
+      customer.password
+    );
+
+    if (!matchPassword) {
+      return res.status(401).send({ error: "Incorrect credentials!" });
+    }
+
+    return res.status(200).send(customer);
+  } catch (err) {
+    return res.status(500).send(err);
+  }
+}
+
 const customerControllers = {
   registerCustomer,
+  loginCustomer,
 };
 
 export default customerControllers;
