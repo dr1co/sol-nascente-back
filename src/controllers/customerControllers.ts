@@ -63,7 +63,12 @@ async function loginCustomer(req: Request, res: Response, next: NextFunction) {
       return res.status(401).send({ error: "Incorrect credentials!" });
     }
 
-    return res.status(200).send(customer);
+    return res.status(200).send({
+      id: customer.id,
+      name: customer.name,
+      email: customer.email,
+      cpf: customer.cpf,
+    });
   } catch (err) {
     return res.status(500).send(err);
   }
